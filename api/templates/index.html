@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Minna no Nihongo - Mode Telponan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #4f8cff 0%, #ffb86b 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 48px auto;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(79,140,255,0.10);
+            padding: 32px 24px;
+            text-align: center;
+        }
+        h1 {
+            color: #4f8cff;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        .desc {
+            color: #444;
+            font-size: 1.15rem;
+            margin-bottom: 28px;
+        }
+        .nav {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .nav a {
+            display: block;
+            background: linear-gradient(135deg, #4f8cff 60%, #ffb86b 100%);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.13rem;
+            padding: 16px 0;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(79,140,255,0.10);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .nav a:hover {
+            background: linear-gradient(135deg, #2d5fa4 60%, #ff7e5f 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .footer {
+            margin-top: 38px;
+            color: #888;
+            font-size: 0.98rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 Minna no Nihongo</h1>
+        <div class="desc">
+            Pilih fitur latihan:<br>
+            <b>Kaiwa</b> (Percakapan) &amp; <b>Renshu</b> (Latihan) per bab.
+        </div>
+        <div class="nav">
+            <a href="/audios">🎵 Daftar Audio Per Bab</a>
+            <a href="/chat">💬 Mode Chat Suara</a>
+            <a href="/about">ℹ️ Tentang Project</a>
+        </div>
+        <div class="footer">
+            &copy; 2025 Mode Telponan &mdash; Minna no Nihongo Kaiwa &amp; Renshu
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+function addBubble(text, sender) {
+    if (!chatHasContent) {
+        document.getElementById('placeholder').style.display = 'none';
+        chatHasContent = true;
+    }
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + sender;
+
+    // Avatar
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = sender === 'user' ? '🧑' : '🤖';
+
+    // Text
+    const bubbleText = document.createElement('div');
+    bubbleText.className = 'bubble-text';
+    bubbleText.textContent = text;
+
+    if (sender === 'user') {
+        bubble.appendChild(bubbleText);
+        bubble.appendChild(avatar);
+    } else {
+        bubble.appendChild(avatar);
+        bubble.appendChild(bubbleText);
+    }
+
+    document.getElementById('chat').appendChild(bubble);
+    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+}
+
+// Cek dukungan SpeechRecognition
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!window.SpeechRecognition) {
+    document.getElementById('status').textContent = "Browser Anda tidak mendukung Speech Recognition.";
+    document.getElementById('status').style.background = "#b0b0b0";
+} else {
+    recognition = new window.SpeechRecognition();
+    recognition.lang = currentLang;
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onstart = function() {
+        isListening = true;
+        document.getElementById('status').textContent = "Status: Mendengarkan...";
+        document.getElementById('status').style.background = "var(--status-listen)";
+        document.getElementById('start').disabled = true;
+        document.getElementById('stop').disabled = false;
+    };
+
+    recognition.onend = function() {
+        isListening = false;
+        document.getElementById('status').textContent = "Status: Tidak aktif";
+        document.getElementById('status').style.background = "var(--status-bg)";
+        document.getElementById('start').disabled = false;
+        document.getElementById('stop').disabled = true;
+    };
+
+    recognition.onerror = function(event) {
+        document.getElementById('status').textContent = "Terjadi error: " + event.error;
+        document.getElementById('status').style.background = "var(--status-error)";
+    };
+
+    document.getElementById('start').onclick = function() {
+        currentLang = document.getElementById('lang').value;
+        recognition.lang = currentLang;
+        recognition.start();
+    };
+
+    document.getElementById('stop').onclick = function() {
+        recognition.stop();
+    };
+
+    document.getElementById('lang').onchange = function() {
+        currentLang = this.value;
+        recognition.lang = (currentLang === 'all') ? 'id-ID' : currentLang; // Set default ke Indonesia jika "Semua Bahasa"
+    };
+}
+
+function generateBotResponse(userInput, lang) {
+    let response = "";
+    if (lang === 'ja-JP') {
+        response = "アナタガ イッタ: " + userInput;
+    } else if (lang === 'id-ID') {
+        response = "Kamu bilang: " + userInput;
+    } else {
+        // Jika "Semua Bahasa" dipilih, coba deteksi bahasa dan berikan respons yang sesuai
+        if (userInput.match(/^[ぁ-んァ-ン一-龥]/)) { // Deteksi Jepang
+            response = "アナタガ イッタ: " + userInput;
+        } else { // Default ke Indonesia
+            response = "Kamu bilang: " + userInput;
+        }
+    }
+    return response;
+}
+
+function speak(text, lang) {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lang;
+    window.speechSynthesis.speak(utter);
+}
+
+recognition.onresult = function(event) {
+    const hasil = event.results[0][0].transcript;
+    addBubble(hasil, 'user');
+
+    // Dapatkan bahasa yang dipilih
+    currentLang = document.getElementById('lang').value;
+
+    // Generate respon bot sesuai bahasa
+    const balasan = generateBotResponse(hasil, currentLang);
+    addBubble(balasan, 'bot');
+
+    // Ucapkan respon bot
+    const utterLang = currentLang === 'all' ? (balasan.startsWith("アナタガ") ? 'ja-JP' : 'id-ID') : currentLang;
+    speak(balasan, utterLang);
+}
+</script>

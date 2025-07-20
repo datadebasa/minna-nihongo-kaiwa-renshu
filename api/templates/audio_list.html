@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Audio Minna no Nihongo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #4f8cff 0%, #ffb86b 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 520px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(79,140,255,0.10);
+            padding: 32px 20px 24px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #4f8cff;
+            font-size: 2.1rem;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+        }
+        .audio-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .audio-list li {
+            margin-bottom: 14px;
+        }
+        .audio-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #4f8cff 60%, #ffb86b 100%);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.08rem;
+            padding: 13px 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(79,140,255,0.10);
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            border: none;
+        }
+        .audio-link:hover {
+            background: linear-gradient(135deg, #2d5fa4 60%, #ff7e5f 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 16px rgba(79,140,255,0.13);
+        }
+        .audio-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .audio-title {
+            font-size: 1.07em;
+            margin-bottom: 2px;
+        }
+        .audio-type {
+            font-size: 0.97em;
+            color: #f7f7f7;
+            opacity: 0.85;
+        }
+        .audio-filename {
+            font-size: 0.91em;
+            color: #e0e0e0;
+            margin-left: 12px;
+            font-weight: 400;
+        }
+        .audio-icon {
+            font-size: 1.5em;
+            margin-left: 10px;
+            opacity: 0.85;
+        }
+        .footer {
+            margin-top: 32px;
+            color: #888;
+            font-size: 1rem;
+        }
+        .footer a {
+            color: #4f8cff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .footer a:hover {
+            color: #2d5fa4;
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100vw;
+                border-radius: 0;
+                margin: 0;
+                padding: 16px 2vw 18px 2vw;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .audio-link {
+                font-size: 1rem;
+                padding: 10px 10px;
+            }
+            .audio-icon {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daftar Audio Per Bab</h1>
+        <ul class="audio-list">
+            {% for file in files %}
+                {% set bab = file.split('_')[3][:3] %}
+                <li>
+                    <a class="audio-link" href="/audios/play/{{ file }}">
+                        <span class="audio-info">
+                            <span class="audio-title">Bab {{ bab|int }}</span>
+                            <span class="audio-type">
+                                {% if file.endswith('1.mp3') %}Kaiwa{% else %}Renshu{% endif %}
+                            </span>
+                        </span>
+                        <span>
+                            <span class="audio-filename">{{ file }}</span>
+                            <span class="audio-icon">▶️</span>
+                        </span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="footer">
+            <a href="&#x2F;">⬅️ Kembali ke Beranda</a>
+        </div>
+    </div>
+</body>
+</html>
