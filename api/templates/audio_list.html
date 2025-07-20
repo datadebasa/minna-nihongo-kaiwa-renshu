@@ -119,12 +119,12 @@
     <div class="container">
         <h1>Daftar Audio Per Bab</h1>
         <ul class="audio-list">
-            {% for file in files %}
-                {% set bab = file.split('_')[3][:3] %}
+            {% for file in files|sort %}
+                {% set cd_number = file.split('_')[-1][:3] %}
                 <li>
                     <a class="audio-link" href="/audios/play/{{ file }}">
                         <span class="audio-info">
-                            <span class="audio-title">Bab {{ bab|int }}</span>
+                            <span class="audio-title">CD {{ cd_number|int }}</span>
                             <span class="audio-type">
                                 {% if file.endswith('1.mp3') %}Kaiwa{% else %}Renshu{% endif %}
                             </span>

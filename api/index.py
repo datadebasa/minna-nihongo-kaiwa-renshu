@@ -12,7 +12,7 @@ gemini = Config()
 print(gemini.gemini_core())
 app = Flask(__name__)
 
-AUDIO_FOLDER = os.path.join('static', 'assets', '0-0001-01-230001')
+AUDIO_FOLDER = os.path.abspath(os.path.join('api', 'static', 'assets', '0-0001-01-230001'))
 
 @app.route('/')
 def home():
@@ -24,7 +24,7 @@ def hello():
 
 @app.route('/about')
 def about():
-    return 'About'
+    return render_template('about.html')
 @app.route('/chat')
 def chat():
     return render_template('chat.html')
@@ -54,7 +54,7 @@ def serve_audio(filename):
     if not os.path.isfile(file_path):
         print(f"File tidak ditemukan: {filename}")
         return render_template('audio_not_found.html', filename=filename)
-    return send_from_directory(AUDIO_FOLDER, filename)
+    return send_from_directory(AUDIO_FOLDER, filename, as_attachment=False)
 
 if __name__ == '__main__':
     app.run(debug=True)
