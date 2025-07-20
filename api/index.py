@@ -14,6 +14,10 @@ app = Flask(__name__)
 def home():
     return 'Hello, World!'
 
+@app.route('/api/v1/message')
+def hello():
+    return 'Hello, Flask!'
+
 @app.route('/about')
 def about():
     return 'About'
