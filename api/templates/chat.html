@@ -291,8 +291,7 @@
     </div>
     <div class="controls">
         <button id="start">🎤 Dengarkan</button>
-        <button id="stop" disabled>⏹️ Berhenti</button>
-        <button id="download" style="margin-left:10px;">⬇️ Download Riwayat</button>
+        <!-- Tombol stop dihapus, hanya tombol rekam -->
     </div>
     <script>
     let recognition;
@@ -337,18 +336,7 @@
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
     }
 
-    // Fungsi untuk menyimpan riwayat chat ke file JSON (client-side)
-    function downloadHistory() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory, null, 2));
-        const dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", "riwayat.json");
-        document.body.appendChild(dlAnchorElem);
-        dlAnchorElem.click();
-        dlAnchorElem.remove();
-    }
-
-    document.getElementById('download').onclick = downloadHistory;
+    // Tidak perlu fungsi sendHistoryToServer terpisah, karena riwayat dikirim bersama chat
 
     // Cek dukungan SpeechRecognition
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -365,49 +353,52 @@
             isListening = true;
             document.getElementById('status').textContent = "Status: Mendengarkan...";
             document.getElementById('status').style.background = "var(--status-listen)";
-            document.getElementById('start').disabled = true;
-            document.getElementById('stop').disabled = false;
+            document.getElementById('start').textContent = "⏹️ Berhenti";
         };
 
         recognition.onend = function() {
             isListening = false;
             document.getElementById('status').textContent = "Status: Tidak aktif";
             document.getElementById('status').style.background = "var(--status-bg)";
-            document.getElementById('start').disabled = false;
-            document.getElementById('stop').disabled = true;
+            document.getElementById('start').textContent = "🎤 Dengarkan";
         };
 
         recognition.onerror = function(event) {
             document.getElementById('status').textContent = "Terjadi error: " + event.error;
             document.getElementById('status').style.background = "var(--status-error)";
+            document.getElementById('start').textContent = "🎤 Dengarkan";
+            isListening = false;
         };
 
         document.getElementById('start').onclick = function() {
-            recognition.lang = currentLang;
-            recognition.start();
-        };
-
-        document.getElementById('stop').onclick = function() {
-            recognition.stop();
+            if (isListening) {
+                // Jika sedang merekam, klik lagi = stop
+                recognition.stop();
+            } else {
+                recognition.lang = currentLang;
+                recognition.start();
+            }
         };
     }
 
-    // Fungsi untuk mengirim chat history dan user input ke backend
+    // Fungsi untuk mengirim chat history dan user input ke backend (beserta file json riwayat)
     async function sendToBackend(userInput) {
-        // Siapkan file JSON dari chatHistory
-        const historyBlob = new Blob([JSON.stringify(chatHistory, null, 2)], {type: "application/json"});
-        const formData = new FormData();
-        formData.append("json", historyBlob, "riwayat.json");
-        formData.append("promt", userInput);
-
-        // Bab start dan end dari dropdown, default 1-50 jika tidak dipilih
+        // Ambil bab dari dropdown, default 1-50 jika tidak dipilih
         let babStart = selectedBab ? selectedBab : "1";
         let babEnd = selectedBab ? selectedBab : "50";
+
+        // Siapkan FormData untuk mengirim file dan data lain
+        let formData = new FormData();
         formData.append("bab_start", babStart);
         formData.append("bab_end", babEnd);
+        formData.append("promt", userInput);
+
+        // Buat file JSON dari chatHistory
+        const historyBlob = new Blob([JSON.stringify(chatHistory)], {type: "application/json"});
+        formData.append("json", historyBlob, "riwayat.json");
 
         try {
-            const response = await fetch("https://open-source-backend.vercel.app/kaiwa", {
+            const response = await fetch("/api/v1/kaiwa", {
                 method: "POST",
                 body: formData
             });
@@ -443,7 +434,7 @@
             addBubble(hasil, 'user');
             chatHistory.push({role: "user", content: hasil, bab: selectedBab || ""});
 
-            // Kirim ke backend dan tunggu respon
+            // Kirim ke backend dan tunggu respon (beserta riwayat sebagai file json)
             document.getElementById('status').textContent = "Status: Menghubungi bot...";
             document.getElementById('status').style.background = "var(--status-bg)";
             const {botText, audioUrl} = await sendToBackend(hasil);

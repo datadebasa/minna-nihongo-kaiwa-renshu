@@ -76,9 +76,16 @@ def kaiwa_proxy():
         'bab_end': bab_end
     }
     files = {}
+    # Penjelasan:
+    # Ketika file dikirim dari frontend (FormData), Flask akan menerima file tersebut sebagai objek FileStorage.
+    # Untuk mengirim file ke backend lain via requests, format tuple-nya: (filename, fileobj, mimetype)
+    # Namun, jika fileobj adalah stream (misal .stream), kadang backend tujuan tidak bisa membaca ulang stream yang sudah dibaca.
+    # Solusi: gunakan .read() untuk mendapatkan bytes, lalu kirim sebagai io.BytesIO agar bisa dibaca ulang.
+    import io
     if json_file:
-        files['json'] = (json_file.filename, json_file.stream, json_file.mimetype)
-
+        file_bytes = json_file.read()
+        files['json'] = (json_file.filename, io.BytesIO(file_bytes), json_file.mimetype)
+    print(files)
     # Kirim request ke backend
     try:
         backend_url = "https://open-source-backend.vercel.app/kaiwa"
