@@ -6,7 +6,7 @@ Terima kasih telah tertarik untuk berkontribusi pada **MinnaKaiwa**! Platform in
 
 ### 🐛 Melaporkan Bug
 
-1. Periksa apakah bug sudah dilaporkan di [Issues](https://github.com/datadebasa/minna-no-nihongo-practice-app/issues)
+1. Periksa apakah bug sudah dilaporkan di [Issues](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues)
 2. Buat issue baru dengan label `bug`
 3. Jelaskan bug dengan detail:
    - Langkah reproduksi
@@ -16,7 +16,7 @@ Terima kasih telah tertarik untuk berkontribusi pada **MinnaKaiwa**! Platform in
 
 ### 💡 Mengusulkan Fitur
 
-1. Periksa apakah fitur sudah diusulkan di [Issues](https://github.com/datadebasa/minna-no-nihongo-practice-app/issues)
+1. Periksa apakah fitur sudah diusulkan di [Issues](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues)
 2. Buat issue baru dengan label `enhancement`
 3. Jelaskan fitur yang diusulkan:
    - Tujuan dan manfaat
@@ -29,8 +29,8 @@ Terima kasih telah tertarik untuk berkontribusi pada **MinnaKaiwa**! Platform in
 
 1. **Fork Repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/minna-no-nihongo-practice-app.git
-cd minna-no-nihongo-practice-app
+git clone https://github.com/YOUR_USERNAME/minna-nihongo-kaiwa-renshu.git
+cd minna-nihongo-kaiwa-renshu
 ```
 
 2. **Install Dependencies**
@@ -150,7 +150,7 @@ api/
 ## 🏆 Recognition
 
 Kontributor akan diakui di:
-- [Contributors](https://github.com/datadebasa/minna-no-nihongo-practice-app/graphs/contributors) page
+- [Contributors](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/graphs/contributors) page
 - README.md (untuk kontribusi signifikan)
 - Release notes
 

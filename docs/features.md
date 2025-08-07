@@ -200,6 +200,12 @@ Dokumentasi lengkap tentang semua fitur yang tersedia di platform MinnaKaiwa.
 - **Use case** - Jelaskan bagaimana fitur akan digunakan
 - **Mockup** - Jika ada, tambahkan wireframe/mockup
 
+## 🔗 Links
+
+- **Source Code:** [https://github.com/datadebasa/minna-nihongo-kaiwa-renshu](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu)
+- **Developer Website:** [https://sodikinnaa.my.id/](https://sodikinnaa.my.id/)
+- **Live Demo:** [https://minna-nihongo-kaiwa-renshu.vercel.app/](https://minna-nihongo-kaiwa-renshu.vercel.app/)
+
 ---
 
 <div align="center">

@@ -20,7 +20,7 @@ Platform ini menggunakan kurikulum standar **Minna no Nihongo** yang merupakan b
 
 ## 🚀 Demo
 
-**Live Demo:** [https://minnakaiwa.vercel.app/](https://minnakaiwa.vercel.app/)
+**Live Demo:** [https://minna-nihongo-kaiwa-renshu.vercel.app/](https://minna-nihongo-kaiwa-renshu.vercel.app/)
 
 ## 🛠️ Teknologi
 

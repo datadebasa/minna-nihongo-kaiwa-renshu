@@ -59,8 +59,8 @@ MinnaKaiwa adalah platform pembelajaran bahasa Jepang yang dirancang untuk memba
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/minna-no-nihongo-practice-app.git
-cd minna-no-nihongo-practice-app
+git clone https://github.com/datadebasa/minna-nihongo-kaiwa-renshu.git
+cd minna-nihongo-kaiwa-renshu
 
 # Install dependencies
 pip install -r requirements.txt
@@ -102,8 +102,8 @@ Kami sangat menghargai kontribusi dari komunitas! Silakan lihat [CONTRIBUTING.md
 
 Jika Anda membutuhkan bantuan:
 
-- **Issues:** [GitHub Issues](https://github.com/your-username/minna-no-nihongo-practice-app/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/your-username/minna-no-nihongo-practice-app/discussions)
+- **Issues:** [GitHub Issues](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/discussions)
 - **Email:** support@minnakaiwa.com
 
 ## 📄 License

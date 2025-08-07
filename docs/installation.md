@@ -58,8 +58,8 @@ sudo apt install git
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/minna-no-nihongo-practice-app.git
-cd minna-no-nihongo-practice-app
+git clone https://github.com/datadebasa/minna-nihongo-kaiwa-renshu.git
+cd minna-nihongo-kaiwa-renshu
 ```
 
 ### 2. Setup Virtual Environment
@@ -171,8 +171,8 @@ sudo apt update
 sudo apt install nginx python3 python3-pip
 
 # Clone repository
-git clone https://github.com/your-username/minna-no-nihongo-practice-app.git
-cd minna-no-nihongo-practice-app
+git clone https://github.com/datadebasa/minna-nihongo-kaiwa-renshu.git
+cd minna-nihongo-kaiwa-renshu
 
 # Install dependencies
 pip3 install -r requirements.txt
@@ -189,9 +189,9 @@ After=network.target
 
 [Service]
 User=www-data
-WorkingDirectory=/path/to/minna-no-nihongo-practice-app
-Environment=PATH=/path/to/minna-no-nihongo-practice-app/venv/bin
-ExecStart=/path/to/minna-no-nihongo-practice-app/venv/bin/python api/index.py
+WorkingDirectory=/path/to/minna-nihongo-kaiwa-renshu
+Environment=PATH=/path/to/minna-nihongo-kaiwa-renshu/venv/bin
+ExecStart=/path/to/minna-nihongo-kaiwa-renshu/venv/bin/python api/index.py
 Restart=always
 
 [Install]
@@ -319,7 +319,7 @@ sudo journalctl -u minnakaiwa -f
 Jika mengalami masalah:
 
 1. **Cek dokumentasi** - Lihat [Troubleshooting](troubleshooting.md)
-2. **Search issues** - Cari di [GitHub Issues](https://github.com/your-username/minna-no-nihongo-practice-app/issues)
+2. **Search issues** - Cari di [GitHub Issues](https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues)
 3. **Buat issue baru** - Jika masalah belum ada solusi
 4. **Hubungi support** - Email ke support@minnakaiwa.com
 

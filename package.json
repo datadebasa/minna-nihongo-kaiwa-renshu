@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues"
   },
-  "homepage": "https://minnakaiwa.vercel.app",
+  "homepage": "https://minna-nihongo-kaiwa-renshu.vercel.app",
   "engines": {
     "node": ">=14.0.0"
   }
