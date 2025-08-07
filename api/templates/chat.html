@@ -87,6 +87,17 @@
         .lang-select:focus {
             border: 1.5px solid var(--primary);
         }
+        .bab-select {
+            margin-right: 24px;
+            border-radius: 16px;
+            padding: 7px 16px;
+            border: 1px solid #e0e7ef;
+            background: #f8fafc;
+            font-size: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            outline: none;
+            transition: border 0.2s;
+        }
         .chat-container {
             max-width: 520px;
             margin: 32px auto 0 auto;
@@ -227,7 +238,7 @@
                 padding: 14px 10px;
                 gap: 8px;
             }
-            .lang-select {
+            .lang-select, .bab-select {
                 margin-right: 8px;
                 font-size: 0.98rem;
                 padding: 6px 10px;
@@ -258,10 +269,19 @@
             <span class="header-icon">📞</span>
             <span class="header-title">Mode Telponan</span>
         </div>
-        <select id="lang" class="lang-select">
-            <option value="id-ID">🇮🇩 Bahasa Indonesia</option>
-            <option value="ja-JP">🇯🇵 Bahasa Jepang</option>
-            <option value="all">🌐 Semua Bahasa</option>
+        <!-- Pilihan Bab 1-50 -->
+        <select id="bab" class="bab-select">
+            <option value="">Pilih Bab</option>
+            <!-- Bab 1-50 -->
+            <script>
+                for(let i=1;i<=50;i++){
+                    document.write('<option value="'+i+'">Bab '+i+'</option>');
+                }
+            </script>
+        </select>
+        <!-- Pilihan bahasa tetap, tapi disembunyikan karena output selalu Jepang -->
+        <select id="lang" class="lang-select" style="display:none;">
+            <option value="ja-JP" selected>🇯🇵 Bahasa Jepang</option>
         </select>
     </div>
     <div class="chat-container" id="chat">
@@ -272,12 +292,20 @@
     <div class="controls">
         <button id="start">🎤 Dengarkan</button>
         <button id="stop" disabled>⏹️ Berhenti</button>
+        <button id="download" style="margin-left:10px;">⬇️ Download Riwayat</button>
     </div>
     <script>
     let recognition;
     let isListening = false;
-    let currentLang = document.getElementById('lang').value;
+    let currentLang = "ja-JP"; // Selalu Jepang
     let chatHasContent = false;
+    let selectedBab = "";
+    let chatHistory = []; // Array untuk menyimpan riwayat chat
+
+    // Update selectedBab saat dropdown bab berubah
+    document.getElementById('bab').onchange = function() {
+        selectedBab = this.value;
+    };
 
     function addBubble(text, sender) {
         if (!chatHasContent) {
@@ -308,6 +336,19 @@
         document.getElementById('chat').appendChild(bubble);
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
     }
+
+    // Fungsi untuk menyimpan riwayat chat ke file JSON (client-side)
+    function downloadHistory() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory, null, 2));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", "riwayat.json");
+        document.body.appendChild(dlAnchorElem);
+        dlAnchorElem.click();
+        dlAnchorElem.remove();
+    }
+
+    document.getElementById('download').onclick = downloadHistory;
 
     // Cek dukungan SpeechRecognition
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -342,7 +383,6 @@
         };
 
         document.getElementById('start').onclick = function() {
-            currentLang = document.getElementById('lang').value;
             recognition.lang = currentLang;
             recognition.start();
         };
@@ -350,52 +390,74 @@
         document.getElementById('stop').onclick = function() {
             recognition.stop();
         };
-
-        document.getElementById('lang').onchange = function() {
-            currentLang = this.value;
-            recognition.lang = (currentLang === 'all') ? 'id-ID' : currentLang; // Set default ke Indonesia jika "Semua Bahasa"
-        };
     }
 
-    function generateBotResponse(userInput, lang) {
-        let response = "";
-        if (lang === 'ja-JP') {
-            response = "アナタガ イッタ: " + userInput;
-        } else if (lang === 'id-ID') {
-            response = "Kamu bilang: " + userInput;
-        } else {
-            // Jika "Semua Bahasa" dipilih, coba deteksi bahasa dan berikan respons yang sesuai
-            if (userInput.match(/^[ぁ-んァ-ン一-龥]/)) { // Deteksi Jepang
-                response = "アナタガ イッタ: " + userInput;
-            } else { // Default ke Indonesia
-                response = "Kamu bilang: " + userInput;
+    // Fungsi untuk mengirim chat history dan user input ke backend
+    async function sendToBackend(userInput) {
+        // Siapkan file JSON dari chatHistory
+        const historyBlob = new Blob([JSON.stringify(chatHistory, null, 2)], {type: "application/json"});
+        const formData = new FormData();
+        formData.append("json", historyBlob, "riwayat.json");
+        formData.append("promt", userInput);
+
+        // Bab start dan end dari dropdown, default 1-50 jika tidak dipilih
+        let babStart = selectedBab ? selectedBab : "1";
+        let babEnd = selectedBab ? selectedBab : "50";
+        formData.append("bab_start", babStart);
+        formData.append("bab_end", babEnd);
+
+        try {
+            const response = await fetch("https://open-source-backend.vercel.app/kaiwa", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error("Gagal menghubungi backend");
             }
+            const data = await response.json();
+            // Mendapatkan response bot dan audio jika ada
+            const botText = data?.payload?.output?.response || "Tidak ada respon dari bot.";
+            const audioUrl = data?.payload?.output?.audio || null;
+            return {botText, audioUrl};
+        } catch (err) {
+            return {botText: "Terjadi error: " + err.message, audioUrl: null};
         }
-        return response;
     }
 
-    function speak(text, lang) {
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = lang;
-        window.speechSynthesis.speak(utter);
+    function speak(text, audioUrl) {
+        // Jika backend mengembalikan audio, mainkan audio, jika tidak pakai TTS browser
+        if (audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play();
+        } else {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = "ja-JP";
+            window.speechSynthesis.speak(utter);
+        }
     }
 
-    recognition.onresult = function(event) {
-        const hasil = event.results[0][0].transcript;
-        addBubble(hasil, 'user');
+    // Event hasil pengenalan suara
+    if (window.SpeechRecognition) {
+        recognition.onresult = async function(event) {
+            const hasil = event.results[0][0].transcript;
+            addBubble(hasil, 'user');
+            chatHistory.push({role: "user", content: hasil, bab: selectedBab || ""});
 
-        // Dapatkan bahasa yang dipilih
-        currentLang = document.getElementById('lang').value;
+            // Kirim ke backend dan tunggu respon
+            document.getElementById('status').textContent = "Status: Menghubungi bot...";
+            document.getElementById('status').style.background = "var(--status-bg)";
+            const {botText, audioUrl} = await sendToBackend(hasil);
 
-        // Generate respon bot sesuai bahasa
-        const balasan = generateBotResponse(hasil, currentLang);
-        addBubble(balasan, 'bot');
+            addBubble(botText, 'bot');
+            chatHistory.push({role: "bot", content: botText, bab: selectedBab || ""});
 
-        // Ucapkan respon bot
-        const utterLang = currentLang === 'all' ? (balasan.startsWith("アナタガ") ? 'ja-JP' : 'id-ID') : currentLang;
-        speak(balasan, utterLang);
+            // Ucapkan respon bot (dari audio backend jika ada)
+            speak(botText, audioUrl);
+
+            document.getElementById('status').textContent = "Status: Siap";
+            document.getElementById('status').style.background = "var(--status-bg)";
+        }
     }
-</script>
-
+    </script>
 </body>
 </html>

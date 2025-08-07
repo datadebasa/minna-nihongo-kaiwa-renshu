@@ -2,7 +2,8 @@
 *.log
 *.pyc
 __pycache__
-
+# external project 
+doroidcam/
 # Environments 
 .env 
 .venv 

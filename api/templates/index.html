@@ -81,9 +81,10 @@
 
 <script>
 function addBubble(text, sender) {
-    if (!chatHasContent) {
-        document.getElementById('placeholder').style.display = 'none';
-        chatHasContent = true;
+    if (!window.chatHasContent) {
+        const placeholder = document.getElementById('placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+        window.chatHasContent = true;
     }
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble ' + sender;
@@ -106,15 +107,26 @@ function addBubble(text, sender) {
         bubble.appendChild(bubbleText);
     }
 
-    document.getElementById('chat').appendChild(bubble);
-    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+    const chatDiv = document.getElementById('chat');
+    if (chatDiv) {
+        chatDiv.appendChild(bubble);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
 }
 
 // Cek dukungan SpeechRecognition
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+let currentLang = 'id-ID';
+let isListening = false;
+window.chatHasContent = false;
+
 if (!window.SpeechRecognition) {
-    document.getElementById('status').textContent = "Browser Anda tidak mendukung Speech Recognition.";
-    document.getElementById('status').style.background = "#b0b0b0";
+    const status = document.getElementById('status');
+    if (status) {
+        status.textContent = "Browser Anda tidak mendukung Speech Recognition.";
+        status.style.background = "#b0b0b0";
+    }
 } else {
     recognition = new window.SpeechRecognition();
     recognition.lang = currentLang;
@@ -123,56 +135,78 @@ if (!window.SpeechRecognition) {
 
     recognition.onstart = function() {
         isListening = true;
-        document.getElementById('status').textContent = "Status: Mendengarkan...";
-        document.getElementById('status').style.background = "var(--status-listen)";
-        document.getElementById('start').disabled = true;
-        document.getElementById('stop').disabled = false;
+        const status = document.getElementById('status');
+        if (status) {
+            status.textContent = "Status: Mendengarkan...";
+            status.style.background = "var(--status-listen)";
+        }
+        const startBtn = document.getElementById('start');
+        const stopBtn = document.getElementById('stop');
+        if (startBtn) startBtn.disabled = true;
+        if (stopBtn) stopBtn.disabled = false;
     };
 
     recognition.onend = function() {
         isListening = false;
-        document.getElementById('status').textContent = "Status: Tidak aktif";
-        document.getElementById('status').style.background = "var(--status-bg)";
-        document.getElementById('start').disabled = false;
-        document.getElementById('stop').disabled = true;
+        const status = document.getElementById('status');
+        if (status) {
+            status.textContent = "Status: Tidak aktif";
+            status.style.background = "var(--status-bg)";
+        }
+        const startBtn = document.getElementById('start');
+        const stopBtn = document.getElementById('stop');
+        if (startBtn) startBtn.disabled = false;
+        if (stopBtn) stopBtn.disabled = true;
     };
 
     recognition.onerror = function(event) {
-        document.getElementById('status').textContent = "Terjadi error: " + event.error;
-        document.getElementById('status').style.background = "var(--status-error)";
+        const status = document.getElementById('status');
+        if (status) {
+            status.textContent = "Terjadi error: " + event.error;
+            status.style.background = "var(--status-error)";
+        }
     };
 
-    document.getElementById('start').onclick = function() {
+    document.getElementById('start') && (document.getElementById('start').onclick = function() {
         currentLang = document.getElementById('lang').value;
         recognition.lang = currentLang;
         recognition.start();
-    };
+    });
 
-    document.getElementById('stop').onclick = function() {
+    document.getElementById('stop') && (document.getElementById('stop').onclick = function() {
         recognition.stop();
-    };
+    });
 
-    document.getElementById('lang').onchange = function() {
+    document.getElementById('lang') && (document.getElementById('lang').onchange = function() {
         currentLang = this.value;
-        recognition.lang = (currentLang === 'all') ? 'id-ID' : currentLang; // Set default ke Indonesia jika "Semua Bahasa"
-    };
+        recognition.lang = (currentLang === 'all') ? 'id-ID' : currentLang;
+    });
 }
 
-function generateBotResponse(userInput, lang) {
-    let response = "";
-    if (lang === 'ja-JP') {
-        response = "アナタガ イッタ: " + userInput;
-    } else if (lang === 'id-ID') {
-        response = "Kamu bilang: " + userInput;
-    } else {
-        // Jika "Semua Bahasa" dipilih, coba deteksi bahasa dan berikan respons yang sesuai
-        if (userInput.match(/^[ぁ-んァ-ン一-龥]/)) { // Deteksi Jepang
-            response = "アナタガ イッタ: " + userInput;
-        } else { // Default ke Indonesia
-            response = "Kamu bilang: " + userInput;
+// Fungsi untuk memanggil API kaiwa
+async function fetchKaiwaResponse(userInput, lang) {
+    // Endpoint relative agar fetch ke host sendiri (bisa localhost atau production)
+    const apiUrl = "/api/v1/kaiwa";
+    const formData = new FormData();
+    formData.append('promt', userInput);
+    formData.append('bab_start', '1');
+    formData.append('bab_end', '1');
+    // Anda bisa menyesuaikan bab_start dan bab_end sesuai kebutuhan
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) {
+            return "response.ok: " + response + " | Maaf, terjadi kesalahan pada server.";
         }
+        const data = await response.json();
+        // Asumsikan respons API: { "result": "..." } atau { "response": "..." }
+        return data.result || data.response || "Tidak ada balasan dari server.";
+    } catch (e) {
+        return "Gagal menghubungi server: " + e;
     }
-    return response;
 }
 
 function speak(text, lang) {
@@ -181,19 +215,38 @@ function speak(text, lang) {
     window.speechSynthesis.speak(utter);
 }
 
-recognition.onresult = function(event) {
-    const hasil = event.results[0][0].transcript;
-    addBubble(hasil, 'user');
+if (window.SpeechRecognition) {
+    recognition.onresult = async function(event) {
+        const hasil = event.results[0][0].transcript;
+        addBubble(hasil, 'user');
 
-    // Dapatkan bahasa yang dipilih
-    currentLang = document.getElementById('lang').value;
+        // Dapatkan bahasa yang dipilih
+        currentLang = document.getElementById('lang').value;
 
-    // Generate respon bot sesuai bahasa
-    const balasan = generateBotResponse(hasil, currentLang);
-    addBubble(balasan, 'bot');
+        // Panggil API kaiwa
+        addBubble("⏳ Memproses...", 'bot');
+        const chatDiv = document.getElementById('chat');
+        let loadingBubble;
+        if (chatDiv) {
+            loadingBubble = chatDiv.lastChild;
+        }
 
-    // Ucapkan respon bot
-    const utterLang = currentLang === 'all' ? (balasan.startsWith("アナタガ") ? 'ja-JP' : 'id-ID') : currentLang;
-    speak(balasan, utterLang);
+        const balasan = await fetchKaiwaResponse(hasil, currentLang);
+
+        // Hapus bubble loading jika ada
+        if (loadingBubble && loadingBubble.classList.contains('chat-bubble')) {
+            chatDiv.removeChild(loadingBubble);
+        }
+
+        addBubble(balasan, 'bot');
+
+        // Ucapkan respon bot
+        // Deteksi bahasa balasan untuk pengucapan
+        let utterLang = 'id-ID';
+        if (currentLang === 'ja-JP' || (currentLang === 'all' && /^[ぁ-んァ-ン一-龥]/.test(balasan))) {
+            utterLang = 'ja-JP';
+        }
+        speak(balasan, utterLang);
+    }
 }
 </script>

@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template
-import os
-from flask import send_from_directory, abort
+import os, requests
+from flask import send_from_directory, abort, request, jsonify
 
 class Config:
     def gemini_core(self):
@@ -56,5 +56,36 @@ def serve_audio(filename):
         return render_template('audio_not_found.html', filename=filename)
     return send_from_directory(AUDIO_FOLDER, filename, as_attachment=False)
 
+
+@app.route('/api/v1/kaiwa', methods=['POST'])
+def kaiwa_proxy():
+    """
+    Proxy endpoint untuk mengirim permintaan ke backend open-source-backend.vercel.app/kaiwa
+    Expects form-data: promt, bab_start, bab_end (semua string), dan optional file 'json'
+    """
+    # Ambil data dari form
+    promt = request.form.get('promt')
+    bab_start = request.form.get('bab_start')
+    bab_end = request.form.get('bab_end')
+    json_file = request.files.get('json')
+
+    # Siapkan data form untuk dikirim ke backend
+    data = {
+        'promt': promt,
+        'bab_start': bab_start,
+        'bab_end': bab_end
+    }
+    files = {}
+    if json_file:
+        files['json'] = (json_file.filename, json_file.stream, json_file.mimetype)
+
+    # Kirim request ke backend
+    try:
+        backend_url = "https://open-source-backend.vercel.app/kaiwa"
+        response = requests.post(backend_url, data=data, files=files)
+        return jsonify(response.json()), response.status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
