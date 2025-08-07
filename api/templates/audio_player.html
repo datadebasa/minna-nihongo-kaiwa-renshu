@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Memutar Audio</title>
+    <title>MinnaKaiwa - Audio Player</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -64,7 +64,7 @@
     <div class="container">
         {% set bab = filename.split('_')[3][:3] %}
         <h1>
-            Memutar: Bab {{ bab|int }} -
+            🎵 MinnaKaiwa - Bab {{ bab|int }} 
             {% if filename.endswith('1.mp3') %}Kaiwa{% else %}Renshu{% endif %}
         </h1>
         <div class="filename">{{ filename }}</div>
@@ -76,6 +76,13 @@
         </div>
         <div class="footer">
             <a class="back-link" href="/audios">⬅️ Kembali ke daftar audio</a>
+            <br><br>
+            <small>&copy; 2025 MinnaKaiwa - Minna no Nihongo Practice Platform</small>
+            <br>
+            <small>
+                <a href="https://github.com/datadebasa/minna-nihongo-kaiwa-renshu" target="_blank" style="color: #4f8cff; text-decoration: none;">📂 Source Code</a> | 
+                <a href="https://sodikinnaa.my.id/" target="_blank" style="color: #4f8cff; text-decoration: none;">👨‍💻 Developer</a>
+            </small>
         </div>
     </div>
 </body>

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Daftar Audio Minna no Nihongo</title>
+    <title>MinnaKaiwa - Daftar Audio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -117,7 +117,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Daftar Audio Per Bab</h1>
+        <h1>🎵 MinnaKaiwa - Audio Per Bab</h1>
         <ul class="audio-list">
             {% for file in files|sort %}
                 {% set cd_number = file.split('_')[-1][:3] %}
@@ -139,6 +139,13 @@
         </ul>
         <div class="footer">
             <a href="&#x2F;">⬅️ Kembali ke Beranda</a>
+            <br><br>
+            <small>&copy; 2025 MinnaKaiwa - Minna no Nihongo Practice Platform</small>
+            <br>
+            <small>
+                <a href="https://github.com/datadebasa/minna-nihongo-kaiwa-renshu" target="_blank" style="color: #4f8cff; text-decoration: none;">📂 Source Code</a> | 
+                <a href="https://sodikinnaa.my.id/" target="_blank" style="color: #4f8cff; text-decoration: none;">👨‍💻 Developer</a>
+            </small>
         </div>
     </div>
 </body>

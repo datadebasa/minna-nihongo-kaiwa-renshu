@@ -1,0 +1,34 @@
+{
+  "name": "minnakaiwa",
+  "version": "1.0.0",
+  "description": "MinnaKaiwa - Minna no Nihongo Practice Platform",
+  "main": "api/index.py",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "python api/index.py"
+  },
+  "keywords": [
+    "japanese",
+    "language-learning",
+    "minna-no-nihongo",
+    "kaiwa",
+    "renshu",
+    "flask",
+    "python",
+    "education"
+  ],
+  "author": "MinnaKaiwa Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datadebasa/minna-nihongo-kaiwa-renshu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/datadebasa/minna-nihongo-kaiwa-renshu/issues"
+  },
+  "homepage": "https://minnakaiwa.vercel.app",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
